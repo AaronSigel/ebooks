@@ -1,0 +1,35 @@
+{% extends 'main/base.html' %} {% block title %} Add book {% endblock title %}
+{% block content %}
+<h1>Add book</h1>
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %} {{form.as_p}}
+  <button type="submit">Add book</button>
+</form>
+
+<div id="res">
+
+</div>
+
+<script>
+    $('#add-book').submit(function(e) {
+        e.preventDefault();
+        $form = $(this);
+        var data = new FormData(this);
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'add_book' %}",
+            data: data,
+            success: function (response) {
+                console.log(response);
+                if (response.error) {
+                    alert(response.error);
+                }
+                $("#id").html("<p>The book successfully added!</p>")
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+</script>
+{% endblock content %}

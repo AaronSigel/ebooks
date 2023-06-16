@@ -1,0 +1,65 @@
+{% extends 'main/base.html' %} {% block content %}
+
+<div>
+  <input name="search" id="search" type="text" placeholder="Search..." />
+</div>
+
+<div class="books" id="books">
+  {% for book in books %}
+  <div class="book-container">
+    <img
+      class="book-cover"
+      src="{{ book.image.url }}"
+      alt="{{book.title}} by {{book.author}}"
+    />
+    <div class="book-details">
+      <h2 class="book-title">{{ book.title }}</h2>
+      <p class="book-author">Author: {{ book.author }}</p>
+      <p class="book-genre">Genre: {{ book.genre }}</p>
+      <p class="book-description">Description: {{ book.description }}</p>
+      <a href="{{book.file.url}}"><button>Read</button></a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+  $(document).ready(function() {
+  $("#search").keyup(function () {
+    var search_val = $("#search").val();
+    if (search_val != "") {
+    $.ajax({
+      url: "{% url 'upd_library' %}?query="+encodeURIComponent(search_val),
+      type: "GET",
+      success: function (response) {
+        upd_data = JSON.parse(response);
+        console.log(upd_data)
+        var text = "";
+
+        for (var i = 0; i < upd_data.length; i++) {
+          text += "<div class='book-container'>";
+          text += "<img class='book-cover' src='" + upd_data[i].image + "' alt='" +
+            upd_data[i].title + " by " + upd_data[i].author.first_name + "'/>";
+          text += "<div class='book-details'>";
+          text += "<h2 class='book-title'>" + upd_data[i].title + "</h2>";
+          text += "<p class='book-author'>Author: " + upd_data[i].author + "</p>";
+          text += "<p class='book-genre'>Genre: " + upd_data[i].genre + "</p>";
+          text += "<p class='book-description'>Description: " + upd_data[i].description + "</p>";
+          text += "<a href='/media/" + upd_data[i].file + "'><button>Read</button></a>";
+          text += "</div>";
+          text += "</div>";
+        }
+
+        $("#books").html(text);
+      },
+
+      cache: false,
+      contentType: false,
+      processData: false,
+    });
+  }
+  });
+});
+</script>
+
+{% endblock %}
